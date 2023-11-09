@@ -8,6 +8,7 @@ package print_value
 import (
 	"fmt"
 	"reflect"
+	"strings"
 )
 
 type PrintValue struct{}
@@ -26,46 +27,46 @@ func print(v interface{}) string {
 }
 
 func printValue(v reflect.Value) string {
-	var result string
+	var result strings.Builder
 	switch v.Kind() {
 	case reflect.Invalid:
-		result = "nil"
+		result.WriteString("nil")
 	case reflect.Ptr:
 		if !v.IsNil() {
-			result = printValue(v.Elem())
+			result.WriteString(printValue(v.Elem()))
 		} else {
-			result = "nil"
+			result.WriteString("nil")
 		}
 	case reflect.Struct:
-		result += v.Type().Name() + "{"
+		result.WriteString(v.Type().Name() + "{")
 		for i := 0; i < v.NumField(); i++ {
-			result += v.Type().Field(i).Name + ":"
-			result += printValue(v.Field(i))
+			result.WriteString(v.Type().Field(i).Name + ":")
+			result.WriteString(printValue(v.Field(i)))
 			if i != v.NumField()-1 {
-				result += ","
+				result.WriteString(",")
 			}
 		}
-		result += "}"
+		result.WriteString("}")
 	case reflect.Slice, reflect.Array:
-		result += "["
+		result.WriteString("[")
 		for i := 0; i < v.Len(); i++ {
-			result += printValue(v.Index(i))
+			result.WriteString(printValue(v.Index(i)))
 			if i != v.Len()-1 {
-				result += ","
+				result.WriteString(",")
 			}
 		}
-		result += "]"
+		result.WriteString("]")
 	case reflect.Map:
-		result += "map["
+		result.WriteString("map[")
 		for i, key := range v.MapKeys() {
-			result += printValue(key) + ":" + printValue(v.MapIndex(key))
+			result.WriteString(printValue(key) + ":" + printValue(v.MapIndex(key)))
 			if i != len(v.MapKeys())-1 {
-				result += ","
+				result.WriteString(",")
 			}
 		}
-		result += "]"
+		result.WriteString("]")
 	default:
-		result = fmt.Sprintf("%+v", v)
+		result.WriteString(fmt.Sprintf("%+v", v))
 	}
-	return result
+	return result.String()
 }
