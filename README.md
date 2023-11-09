@@ -12,7 +12,7 @@ Print Golang's struct ptr's value
 ## Why I write this tool
 
 When I use fmt.Print-related functions to output a struct pointer, it prints the address. At this point, you can choose
-to implement the String() method, but I'm too lazy, so I wrote this tool."
+to implement the String() method, but I'm too lazy, so I wrote this tool.
 
 ## install
 
