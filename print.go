@@ -2,8 +2,8 @@ package print_value
 
 // @Title        print.go
 // @Description
-// @Create       XdpCs 2023-11-09 10:43
-// @Update       XdpCs 2023-11-09 10:43
+// @Create       XdpCs 2023-11-09 10:51
+// @Update       XdpCs 2023-11-12 21:23
 
 import (
 	"fmt"
@@ -13,24 +13,26 @@ import (
 	"sync"
 )
 
+// Print returns a string representation of v.
+// If you want to print a struct, struct field names must be exported.
 func Print(v interface{}) string {
-	return print(v)
-}
-
-func print(v interface{}) string {
-	value := reflect.ValueOf(v)
-	return printValue(value)
+	return printValue(reflect.ValueOf(v))
 }
 
 func printValue(v reflect.Value) string {
-	result := GetStringBuilder()
-	defer PutStringBuilder(result)
+	result := getStringBuilder()
+	defer putStringBuilder(result)
+	printFieldValue(result, v)
+	return result.String()
+}
+
+func printFieldValue(result *strings.Builder, v reflect.Value) {
 	switch v.Kind() {
 	case reflect.Invalid:
 		result.WriteString("nil")
 	case reflect.Ptr:
 		if !v.IsNil() {
-			result.WriteString(printValue(v.Elem()))
+			printFieldValue(result, v.Elem())
 		} else {
 			result.WriteString("nil")
 		}
@@ -38,7 +40,7 @@ func printValue(v reflect.Value) string {
 		result.WriteString(v.Type().Name() + "{")
 		for i := 0; i < v.NumField(); i++ {
 			result.WriteString(v.Type().Field(i).Name + ":")
-			result.WriteString(printValue(v.Field(i)))
+			printFieldValue(result, v.Field(i))
 			if i != v.NumField()-1 {
 				result.WriteString(",")
 			}
@@ -47,7 +49,7 @@ func printValue(v reflect.Value) string {
 	case reflect.Slice, reflect.Array:
 		result.WriteString("[")
 		for i := 0; i < v.Len(); i++ {
-			result.WriteString(printValue(v.Index(i)))
+			printFieldValue(result, v.Index(i))
 			if i != v.Len()-1 {
 				result.WriteString(",")
 			}
@@ -55,9 +57,12 @@ func printValue(v reflect.Value) string {
 		result.WriteString("]")
 	case reflect.Map:
 		result.WriteString("map[")
-		for i, key := range v.MapKeys() {
-			result.WriteString(printValue(key) + ":" + printValue(v.MapIndex(key)))
-			if i != len(v.MapKeys())-1 {
+		keys := v.MapKeys()
+		for i, key := range keys {
+			printFieldValue(result, key)
+			result.WriteString(":")
+			printFieldValue(result, v.MapIndex(key))
+			if i != len(keys)-1 {
 				result.WriteString(",")
 			}
 		}
@@ -75,7 +80,6 @@ func printValue(v reflect.Value) string {
 	default:
 		result.WriteString(fmt.Sprintf("%+v", v))
 	}
-	return result.String()
 }
 
 var stringBuilderPool = sync.Pool{
@@ -84,11 +88,11 @@ var stringBuilderPool = sync.Pool{
 	},
 }
 
-func GetStringBuilder() *strings.Builder {
+func getStringBuilder() *strings.Builder {
 	return stringBuilderPool.Get().(*strings.Builder)
 }
 
-func PutStringBuilder(builder *strings.Builder) {
+func putStringBuilder(builder *strings.Builder) {
 	builder.Reset()
 	stringBuilderPool.Put(builder)
 }
