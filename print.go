@@ -8,14 +8,10 @@ package print_value
 import (
 	"fmt"
 	"reflect"
+	"strconv"
 	"strings"
+	"sync"
 )
-
-type PrintValue struct{}
-
-func (p *PrintValue) Print(v interface{}) string {
-	return print(v)
-}
 
 func Print(v interface{}) string {
 	return print(v)
@@ -27,7 +23,8 @@ func print(v interface{}) string {
 }
 
 func printValue(v reflect.Value) string {
-	var result strings.Builder
+	result := GetStringBuilder()
+	defer PutStringBuilder(result)
 	switch v.Kind() {
 	case reflect.Invalid:
 		result.WriteString("nil")
@@ -65,8 +62,33 @@ func printValue(v reflect.Value) string {
 			}
 		}
 		result.WriteString("]")
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		result.WriteString(strconv.FormatInt(v.Int(), 10))
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		result.WriteString(strconv.FormatUint(v.Uint(), 10))
+	case reflect.String:
+		result.WriteString(v.String())
+	case reflect.Bool:
+		result.WriteString(strconv.FormatBool(v.Bool()))
+	case reflect.Float32, reflect.Float64:
+		result.WriteString(strconv.FormatFloat(v.Float(), 'f', 2, 64))
 	default:
 		result.WriteString(fmt.Sprintf("%+v", v))
 	}
 	return result.String()
+}
+
+var stringBuilderPool = sync.Pool{
+	New: func() interface{} {
+		return &strings.Builder{}
+	},
+}
+
+func GetStringBuilder() *strings.Builder {
+	return stringBuilderPool.Get().(*strings.Builder)
+}
+
+func PutStringBuilder(builder *strings.Builder) {
+	builder.Reset()
+	stringBuilderPool.Put(builder)
 }

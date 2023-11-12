@@ -107,11 +107,11 @@ func TestPrintValue_PrintFloat(t *testing.T) {
 	testCases := []testCase{
 		{
 			Arg:    t1,
-			Expect: "111.8",
+			Expect: "111.80",
 		},
 		{
 			Arg:    t2,
-			Expect: "111.4",
+			Expect: "111.40",
 		},
 	}
 	for _, testCase := range testCases {
@@ -274,5 +274,37 @@ func TestPrintValue_PrintStruct(t *testing.T) {
 	}
 	for _, testCase := range testCases {
 		assert.Equal(t, testCase.Expect, Print(testCase.Arg), testCase.Expect)
+	}
+}
+
+func BenchmarkPrint(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		Print(&TreeNode{
+			Val: 1,
+			Left: &TreeNode{
+				Val: 2,
+				Left: &TreeNode{
+					Val: 1118,
+				},
+				Right: &TreeNode{
+					Val: 2,
+					Left: &TreeNode{
+						Val: 1118,
+					},
+					Right: &TreeNode{
+						Val: 2,
+						Left: &TreeNode{
+							Val: 1118,
+						},
+					},
+				},
+			},
+			Right: &TreeNode{
+				Val: 3,
+				Left: &TreeNode{
+					Val: 1114,
+				},
+			},
+		})
 	}
 }
