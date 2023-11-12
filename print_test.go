@@ -286,6 +286,18 @@ func BenchmarkPrint(b *testing.B) {
 				Left: &TreeNode{
 					Val: 1118,
 				},
+				Right: &TreeNode{
+					Val: 2,
+					Left: &TreeNode{
+						Val: 1118,
+					},
+					Right: &TreeNode{
+						Val: 2,
+						Left: &TreeNode{
+							Val: 1118,
+						},
+					},
+				},
 			},
 			Right: &TreeNode{
 				Val: 3,
