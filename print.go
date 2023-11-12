@@ -16,23 +16,23 @@ import (
 // Print returns a string representation of v.
 // If you want to print a struct, struct field names must be exported.
 func Print(v interface{}) string {
-	return printValue(reflect.ValueOf(v))
+	return print(reflect.ValueOf(v))
 }
 
-func printValue(v reflect.Value) string {
+func print(v reflect.Value) string {
 	result := getStringBuilder()
 	defer putStringBuilder(result)
-	printFieldValue(result, v)
+	printValue(result, v)
 	return result.String()
 }
 
-func printFieldValue(result *strings.Builder, v reflect.Value) {
+func printValue(result *strings.Builder, v reflect.Value) {
 	switch v.Kind() {
 	case reflect.Invalid:
 		result.WriteString("nil")
 	case reflect.Ptr:
 		if !v.IsNil() {
-			printFieldValue(result, v.Elem())
+			printValue(result, v.Elem())
 		} else {
 			result.WriteString("nil")
 		}
@@ -40,7 +40,7 @@ func printFieldValue(result *strings.Builder, v reflect.Value) {
 		result.WriteString(v.Type().Name() + "{")
 		for i := 0; i < v.NumField(); i++ {
 			result.WriteString(v.Type().Field(i).Name + ":")
-			printFieldValue(result, v.Field(i))
+			printValue(result, v.Field(i))
 			if i != v.NumField()-1 {
 				result.WriteString(",")
 			}
@@ -49,7 +49,7 @@ func printFieldValue(result *strings.Builder, v reflect.Value) {
 	case reflect.Slice, reflect.Array:
 		result.WriteString("[")
 		for i := 0; i < v.Len(); i++ {
-			printFieldValue(result, v.Index(i))
+			printValue(result, v.Index(i))
 			if i != v.Len()-1 {
 				result.WriteString(",")
 			}
@@ -59,9 +59,9 @@ func printFieldValue(result *strings.Builder, v reflect.Value) {
 		result.WriteString("map[")
 		keys := v.MapKeys()
 		for i, key := range keys {
-			printFieldValue(result, key)
+			printValue(result, key)
 			result.WriteString(":")
-			printFieldValue(result, v.MapIndex(key))
+			printValue(result, v.MapIndex(key))
 			if i != len(keys)-1 {
 				result.WriteString(",")
 			}
