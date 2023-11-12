@@ -276,3 +276,17 @@ func TestPrintValue_PrintStruct(t *testing.T) {
 		assert.Equal(t, testCase.Expect, Print(testCase.Arg), testCase.Expect)
 	}
 }
+
+func BenchmarkPrint(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		Print(&TreeNode{
+			Val: 1,
+			Left: &TreeNode{
+				Val: 2,
+			},
+			Right: &TreeNode{
+				Val: 3,
+			},
+		})
+	}
+}
