@@ -76,7 +76,7 @@ func printValue(result *strings.Builder, v reflect.Value) {
 	case reflect.Bool:
 		result.WriteString(strconv.FormatBool(v.Bool()))
 	case reflect.Float32, reflect.Float64:
-		result.WriteString(strconv.FormatFloat(v.Float(), 'f', 2, 64))
+		result.WriteString(strconv.FormatFloat(v.Float(), 'f', 5, 64))
 	default:
 		result.WriteString(fmt.Sprintf("%+v", v))
 	}
