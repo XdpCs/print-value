@@ -3,7 +3,7 @@ package print_value
 // @Title        print_test.go
 // @Description
 // @Create       XdpCs 2023-11-09 10:51
-// @Update       XdpCs 2023-11-09 10:51
+// @Update       XdpCs 2023-11-13 10:11
 
 import (
 	"testing"
@@ -107,11 +107,11 @@ func TestPrintValue_PrintFloat(t *testing.T) {
 	testCases := []testCase{
 		{
 			Arg:    t1,
-			Expect: "111.80",
+			Expect: "111.80000",
 		},
 		{
 			Arg:    t2,
-			Expect: "111.40",
+			Expect: "111.40000",
 		},
 	}
 	for _, testCase := range testCases {
@@ -138,18 +138,18 @@ func TestPrintValue_PrintBool(t *testing.T) {
 }
 
 func TestPrintValue_PrintMap(t *testing.T) {
-	var t1 map[int]string = map[int]string{1: "1"}
-	var t2 map[string]string = map[string]string{"1": "1"}
-	var t3 map[string]*TreeNode = map[string]*TreeNode{
+	t1 := map[int]string{1: "1"}
+	t2 := map[string]string{"1": "1"}
+	t3 := map[string]*TreeNode{
 		"3": nil,
 	}
 	tNode := &TreeNode{
 		Val: 1,
 	}
-	var t4 map[string]*TreeNode = map[string]*TreeNode{
+	t4 := map[string]*TreeNode{
 		"1": tNode,
 	}
-	var t5 map[*TreeNode]string = map[*TreeNode]string{
+	t5 := map[*TreeNode]string{
 		tNode: "1",
 	}
 	testCases := []testCase{
